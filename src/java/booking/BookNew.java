@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletException;
@@ -135,6 +138,15 @@ public class BookNew extends HttpServlet {
             bookUtil.booking = booking;
 
             int box;
+            boolean status = false;
+            if (passengerList.isEmpty()) {
+                out.println("007");
+                out.flush();out.close();
+                return;
+            }
+            else
+                util.Log.logInfo("booking ticktet @"+new Date());
+            util.Log.logInfo("Total number of passengers="+passengerList.size()+"\n");
             if (passengerList.size() >= 5) {
                 box = bookUtil.getANewBox(passengerList.size());
                 System.out.println("In the booking of >5 tics and box=" + box);
@@ -143,9 +155,13 @@ public class BookNew extends HttpServlet {
                 } else {
                     booking.box = box;
                     bookUtil.booking = booking;
-                    bookUtil.arrangeABox(box, passengerList);
+                    status = bookUtil.arrangeABox(box, passengerList);
                 }
-                response.sendRedirect("user/ViewBookedTicket.jsp?pnr=" + booking.pnr);
+                if (status) {
+                    response.sendRedirect("user/ViewBookedTicket.jsp?pnr=" + booking.pnr);
+                } else {
+                    out.println("007");
+                }
 
             } else if (passengerList.size() <= 2) {
                 box = bookUtil.getFew(passengerList);
@@ -174,13 +190,21 @@ public class BookNew extends HttpServlet {
             }
             util.CommitUtil.commit();
         } catch (SQLException ex) {
+            try {
+                util.CommitUtil.rollBack();
+            } catch (SQLException ex1) {
+                Logger.getLogger(BookNew.class.getName()).log(Level.SEVERE, null, ex1);
+            }
             System.out.println("Exception in booknew\n" + ex);
             out.println("006");
-            ex.printStackTrace();
         } catch (NumberFormatException numex) {
+            try {
+                util.CommitUtil.rollBack();
+            } catch (SQLException ex) {
+                Logger.getLogger(BookNew.class.getName()).log(Level.SEVERE, null, ex);
+            }
             System.out.println("numberformat exception in booknew\n");
             out.println("006Number format exception in the system..!");
-            numex.printStackTrace();
         } finally {
             out.close();
         }

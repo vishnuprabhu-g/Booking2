@@ -147,6 +147,7 @@ class BookUtil {
             util.CommitUtil.commit();
         } else {
             util.CommitUtil.rollBack();
+            return false;
         }
         return true;
     }

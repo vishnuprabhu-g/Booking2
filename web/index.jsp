@@ -190,6 +190,8 @@
                         alert("Age required (only number)..!");
                     else if (reply == 006)
                         alert("Exception while processing your request..!");
+                    else if (reply == 007)
+                        alert("No data to process");
                     else
                         $("#main").html(data);
                 });

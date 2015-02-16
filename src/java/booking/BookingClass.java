@@ -91,7 +91,7 @@ public class BookingClass {
                 this.bookedLower++;
             }
             if (racVal > 1) {
-                if (racVal <= 4) {
+                if (racVal <= max_rac) {
                     p.initialSeatNo = racVal++;
                     p.initialStatusId = 2;
                 } else {
@@ -216,7 +216,7 @@ public class BookingClass {
             this.near = tcss.seatNo;
             this.box = tcss.box;
             if (racVal > 1) {
-                if (racVal <= 4) {
+                if (racVal <= max_rac) {
                     p.initialSeatNo = racVal++;
                     p.initialStatusId = 2;
                 } else {
@@ -296,6 +296,9 @@ public class BookingClass {
     }
 
     public boolean finalise() throws SQLException {
+        if(totalPassenger<=0)
+            return false;
+        
         if (onlyConfirm && notConfirm) {
             message = "Confirmed tickets are not available.";
             this.UndoJobs(message);
